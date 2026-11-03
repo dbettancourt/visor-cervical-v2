@@ -29,6 +29,22 @@ h1{font-size:1.7rem;margin:0 0 4px;line-height:1.2}
     .col-info { grid-column: 2 / 3; grid-row: 2 / 3; }
 }
 
+/* [NUEVO] Hacer que la columna del visor se quede fija al hacer scroll en escritorio */
+@media(min-width: 800px) {
+    .col-viz {
+        position: sticky;
+        top: 20px;
+        max-height: calc(100vh - 40px); 
+        overflow-y: auto; 
+        scrollbar-width: none; 
+    }
+    .col-viz::-webkit-scrollbar { display: none; }
+    .fig-wrap {
+        height: 55vh; 
+        min-height: 380px;
+    }
+}
+
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
 .btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 button{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;transition: background 0.2s;}
@@ -38,7 +54,7 @@ button[aria-pressed="true"]:hover{background:var(--acc);}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 
 /* --- VISOR --- */
-.fig-wrap{display:flex;gap:16px;align-items:stretch;width:100%;height: 480px; margin-bottom:16px;}
+.fig-wrap{display:flex;gap:16px;align-items:stretch;width:100%;margin-bottom:16px;}
 .fig-wrap > * {min-width:0;background:var(--bg);border-radius: 8px;overflow: hidden; position: relative;}
 #fig {flex: 1.2; width: 100%;height: 100%;object-fit: contain;}
 #webgl-container {flex: 1; display: flex;justify-content: center;align-items: center; min-height: 400px;}
@@ -104,7 +120,7 @@ h2{font-size:1.15rem;margin:0 0 12px;}
 .medical-form select, .medical-form input[type=text] {width:100%; padding:6px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--ink); font:inherit; margin-top:4px;}
 .medical-form button {background:var(--acc); color:var(--card); border:none; margin-top:10px; font-weight:700;}
 
-/* [NUEVO] Gestor de Archivos */
+/* --- GESTOR DE ARCHIVOS --- */
 .file-manager {background:var(--card); border:2px dashed var(--line); border-radius:8px; padding:16px; text-align:center; margin-bottom:16px; transition: border-color 0.3s; cursor: pointer;}
 .file-manager.drag-over {border-color: var(--acc); background:var(--bg);}
 .file-manager input[type=file] {display: none;}
@@ -140,7 +156,7 @@ h2{font-size:1.15rem;margin:0 0 12px;}
       <h2>Controles</h2>
       <label style="font-weight:400; font-size:0.95rem; background:var(--card); padding:8px; border-radius:6px; border:1px solid var(--line); margin-bottom:16px;"><input type="checkbox" id="sed" checked> Tengo SED o hipermovilidad (mostrar advertencias)</label>
 
-      <!-- [NUEVO] Gestor de Subida de Informes -->
+      <!-- Gestor de Subida de Informes -->
       <div class="medical-form" style="background:var(--card); border-color:var(--acc);">
         <h3>📁 Subir Informes (PDF, TXT, JPG)</h3>
         <div class="file-manager" id="drop-zone">
