@@ -28,12 +28,12 @@ h1{font-size:1.7rem;margin:0 0 4px;line-height:1.2}
 }
 @media(min-width: 1100px) {
     .grid {
-        grid-template-columns: 340px minmax(450px, 1fr) 400px;
+        grid-template-columns: 360px minmax(450px, 1fr) 400px;
     }
 }
 @media(min-width: 800px) and (max-width: 1099px) {
     .grid {
-        grid-template-columns: minmax(400px, 1fr) 340px;
+        grid-template-columns: minmax(400px, 1fr) 360px;
     }
     .col-viz { grid-column: 1 / 2; grid-row: 1 / 3; }
     .col-ctrl { grid-column: 2 / 3; grid-row: 1 / 2; }
@@ -66,7 +66,7 @@ input[type=range]{width:100%;accent-color:var(--acc);margin: 8px 0;}
 /* --- PAD COMPACTO --- */
 #pad{position:relative;width:180px;aspect-ratio:1;margin:0 auto 10px;background:linear-gradient(var(--line),var(--line)) center/1px 100% no-repeat,linear-gradient(var(--line),var(--line)) center/100% 1px no-repeat,var(--bg);border:2px solid var(--line);border-radius:12px;touch-action:none;cursor:grab; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);}
 #pad:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-#pad .safe-zone{position:absolute;left:20%;top:20%;width:60%;height:60%;border:2px dashed var(--safe);border-radius:50%;opacity:.45;pointer-events:none}
+#pad .safe-zone{position:absolute;left:20%;top:20%;width:60%;height:60%;border:2px dashed var(--safe);border-radius:50%;opacity:.45;pointer-events:none; transition: all 0.3s ease;}
 #dot{position:absolute;left:50%;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:var(--acc);border:3px solid var(--card);box-shadow:0 0 0 1px var(--acc);transition:background .15s,border-color .15s}
 #dot.out{background:var(--str);border-color:var(--strbg);box-shadow:0 0 0 1px var(--str)}
 .pl{position:absolute;font-size:.7rem;color:var(--mute);font-weight:700;pointer-events:none; opacity: 0.7;}
@@ -99,7 +99,7 @@ h2{font-size:1.15rem;margin:0 0 12px;}
 .clinical-warning.active {display: block;animation: pulse 2s infinite;}
 @keyframes pulse {0% { box-shadow: 0 0 0 0 rgba(163, 33, 27, 0.4); }70% { box-shadow: 0 0 0 10px rgba(163, 33, 27, 0); }100% { box-shadow: 0 0 0 0 rgba(163, 33, 27, 0); }}
 
-/* --- PERFIL --- */
+/* --- PERFIL Y ASISTENTE --- */
 .profile{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
 .profile h3{font-size:1rem;margin:0 0 12px}
 .profile .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px; justify-content: space-between;}
@@ -108,6 +108,10 @@ h2{font-size:1.15rem;margin:0 0 12px;}
 .profile select{flex:1; padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit;}
 .profile small{color:var(--mute);display:block;margin-top:8px; font-size:.8rem;}
 .profile button {width: 100%; margin-top: 8px;}
+
+.assistant-box {background:var(--bg); border-radius:8px; padding:12px; margin-bottom:16px;}
+.assistant-box label {font-weight:400; font-size:0.9rem; margin-bottom:6px; display:flex; align-items:center; gap:6px;}
+.assistant-box input[type=checkbox] {width:16px; height:16px; accent-color:var(--acc);}
 
 .zone-note{font-size:.9rem;color:var(--str);margin-top:6px;min-height:1.2em; font-weight:700;}
 .zone-note.in{color:var(--safe)}
@@ -132,7 +136,7 @@ h2{font-size:1.15rem;margin:0 0 12px;}
   <div class="col-ctrl">
     <section class="card" aria-label="Controles de movimiento">
       <h2>Controles</h2>
-      <label style="font-weight:400; font-size:0.95rem; background:var(--bg); padding:8px; border-radius:6px;"><input type="checkbox" id="sed" checked> Tengo SED o hipermovilidad (mostrar advertencias)</label>
+      <label style="font-weight:400; font-size:0.95rem; background:var(--card); padding:8px; border-radius:6px; border:1px solid var(--line);"><input type="checkbox" id="sed" checked> Tengo SED o hipermovilidad (mostrar advertencias)</label>
       
       <div class="btns" id="pm" style="margin-top:12px;">
         <button data-h="rot" aria-pressed="true" style="flex:1; font-size:0.9rem; padding:6px;">Rotación</button>
@@ -140,7 +144,7 @@ h2{font-size:1.15rem;margin:0 0 12px;}
       </div>
       
       <div id="pad" tabindex="0" role="group" aria-label="Control de dirección del cuello. Arrastra el punto o usa las flechas del teclado.">
-        <div class="safe-zone" aria-hidden="true"></div>
+        <div class="safe-zone" id="safe-zone-visual" aria-hidden="true"></div>
         <i id="dot"></i><b class="pl u">Extensión</b><b class="pl d">Flexión</b><b class="pl l">Izq.</b><b class="pl r">Der.</b>
       </div>
       
@@ -150,6 +154,23 @@ h2{font-size:1.15rem;margin:0 0 12px;}
       <p class="cap" id="deg" style="margin-top:16px; font-size:0.85rem;"></p>
       <p class="cap" id="pose" aria-live="polite" style="font-weight:700; color:var(--ink);"></p>
       
+      <!-- [NUEVO] Asistente de Certificados/Informes -->
+      <div class="profile" style="border-top:none; margin-top:10px; padding-top:0;">
+        <div class="assistant-box">
+          <h3>⚙️ Configurar desde mi Informe</h3>
+          <p class="cap" style="font-size:0.8rem; margin-bottom:8px;">Marca lo que indiquen tus resonancias o RX para ajustar los límites automáticamente.</p>
+          
+          <label><input type="checkbox" id="inf_ant"> Anterolistesis (deslizamiento)</label>
+          <label><input type="checkbox" id="inf_rect" checked> Rectificación de la lordosis</label>
+          <label><input type="checkbox" id="inf_est"> Estenosis del canal o hernia</label>
+          
+          <button id="btn_generate" style="background:var(--strbg); color:var(--str); border-color:var(--str); margin-top:8px;">
+            Aplicar hallazgos al perfil
+          </button>
+          <p class="cap" id="gen_msg" style="color:var(--safe); font-weight:700; margin-top:8px; display:none;">¡Perfil generado y aplicado!</p>
+        </div>
+      </div>
+
       <div class="profile">
         <h3>Mi perfil (localStorage)</h3>
         <div class="row">
@@ -278,6 +299,15 @@ function syncProfileUI() {
   if (pf) pf.value = PROFILE.flexMax;
   if (pr) pr.value = PROFILE.rotMax;
   if (pz) pz.value = String(PROFILE.zonePct);
+  // Actualizar el tamaño visual del círculo verde
+  const sz = PROFILE.zonePct * 2; // 40% = 80% del pad, 25% = 50%
+  const safeZone = $("safe-zone-visual");
+  if(safeZone) {
+      safeZone.style.left = (100 - sz) / 2 + "%";
+      safeZone.style.top = (100 - sz) / 2 + "%";
+      safeZone.style.width = sz + "%";
+      safeZone.style.height = sz + "%";
+  }
 }
 function readProfileUI() {
   const pf = $("p_flex"), pr = $("p_rot"), pz = $("p_zone");
@@ -647,6 +677,47 @@ $("p_reset").addEventListener("click", () => {
   clearProfile();
   refreshMaxes();
   render();
+});
+
+// [NUEVO] Lógica del asistente de informes
+$("btn_generate").addEventListener("click", () => {
+  const hasAnt = $("inf_ant").checked;
+  const hasRect = $("inf_rect").checked;
+  const hasEst = $("inf_est").checked;
+
+  let newFlex = 40; 
+  let newRot = 60;
+  let newZone = 40;
+
+  if (hasAnt) {
+    newFlex = 30; 
+    newZone = 30; 
+  }
+  if (hasRect) {
+    newFlex -= 5; 
+  }
+  if (hasEst) {
+    newFlex -= 5;
+    newRot = 45; 
+    newZone = 25; 
+  }
+
+  newFlex = Math.max(15, newFlex);
+  newRot = Math.max(30, newRot);
+
+  $("p_flex").value = newFlex;
+  $("p_rot").value = newRot;
+  $("p_zone").value = newZone;
+
+  readProfileUI();
+  saveProfile();
+  refreshMaxes();
+  syncProfileUI();
+  render();
+
+  const msg = $("gen_msg");
+  msg.style.display = "block";
+  setTimeout(() => { msg.style.display = "none"; }, 3000);
 });
 
 loadProfile();
