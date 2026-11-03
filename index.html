@@ -28,12 +28,12 @@ h1{font-size:1.7rem;margin:0 0 4px;line-height:1.2}
 }
 @media(min-width: 1100px) {
     .grid {
-        grid-template-columns: 360px minmax(450px, 1fr) 400px;
+        grid-template-columns: 380px minmax(450px, 1fr) 400px;
     }
 }
 @media(min-width: 800px) and (max-width: 1099px) {
     .grid {
-        grid-template-columns: minmax(400px, 1fr) 360px;
+        grid-template-columns: minmax(400px, 1fr) 380px;
     }
     .col-viz { grid-column: 1 / 2; grid-row: 1 / 3; }
     .col-ctrl { grid-column: 2 / 3; grid-row: 1 / 2; }
@@ -99,7 +99,7 @@ h2{font-size:1.15rem;margin:0 0 12px;}
 .clinical-warning.active {display: block;animation: pulse 2s infinite;}
 @keyframes pulse {0% { box-shadow: 0 0 0 0 rgba(163, 33, 27, 0.4); }70% { box-shadow: 0 0 0 10px rgba(163, 33, 27, 0); }100% { box-shadow: 0 0 0 0 rgba(163, 33, 27, 0); }}
 
-/* --- PERFIL Y ASISTENTE --- */
+/* --- PERFIL Y FORMULARIO MÉDICO --- */
 .profile{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
 .profile h3{font-size:1rem;margin:0 0 12px}
 .profile .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px; justify-content: space-between;}
@@ -109,9 +109,11 @@ h2{font-size:1.15rem;margin:0 0 12px;}
 .profile small{color:var(--mute);display:block;margin-top:8px; font-size:.8rem;}
 .profile button {width: 100%; margin-top: 8px;}
 
-.assistant-box {background:var(--bg); border-radius:8px; padding:12px; margin-bottom:16px;}
-.assistant-box label {font-weight:400; font-size:0.9rem; margin-bottom:6px; display:flex; align-items:center; gap:6px;}
-.assistant-box input[type=checkbox] {width:16px; height:16px; accent-color:var(--acc);}
+.medical-form {background:var(--bg); border-radius:8px; padding:12px; margin-bottom:16px; border:1px solid var(--line);}
+.medical-form h3 {font-size:0.95rem; margin:0 0 10px; color:var(--acc); display:flex; align-items:center; gap:6px;}
+.medical-form label {font-weight:400; font-size:0.85rem; margin-bottom:8px; display:block;}
+.medical-form select, .medical-form input[type=text] {width:100%; padding:6px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--ink); font:inherit; margin-top:4px;}
+.medical-form button {background:var(--acc); color:var(--card); border:none; margin-top:10px; font-weight:700;}
 
 .zone-note{font-size:.9rem;color:var(--str);margin-top:6px;min-height:1.2em; font-weight:700;}
 .zone-note.in{color:var(--safe)}
@@ -136,8 +138,42 @@ h2{font-size:1.15rem;margin:0 0 12px;}
   <div class="col-ctrl">
     <section class="card" aria-label="Controles de movimiento">
       <h2>Controles</h2>
-      <label style="font-weight:400; font-size:0.95rem; background:var(--card); padding:8px; border-radius:6px; border:1px solid var(--line);"><input type="checkbox" id="sed" checked> Tengo SED o hipermovilidad (mostrar advertencias)</label>
-      
+      <label style="font-weight:400; font-size:0.95rem; background:var(--card); padding:8px; border-radius:6px; border:1px solid var(--line); margin-bottom:16px;"><input type="checkbox" id="sed" checked> Tengo SED o hipermovilidad (mostrar advertencias)</label>
+
+      <!-- [NUEVO] Formulario Médico Detallado -->
+      <div class="medical-form">
+        <h3>📋 Configurar desde mi Informe</h3>
+        <p class="cap" style="font-size:0.8rem; margin-bottom:8px;">Selecciona lo que indique tu certificado para ajustar los límites automáticamente.</p>
+        
+        <label>Nivel de la lesión principal:
+          <select id="med_level">
+            <option value="none">No especificado / Normal</option>
+            <option value="c1_c2">C1-C2 (Alta)</option>
+            <option value="c2_c4" selected>C2-C4 (Media)</option>
+            <option value="c5_c7">C5-C7 (Baja)</option>
+          </select>
+        </label>
+
+        <label>Hallazgo principal:
+          <select id="med_finding">
+            <option value="none">Ninguno / Normal</option>
+            <option value="ant" selected>Anterolistesis (deslizamiento)</option>
+            <option value="rect">Rectificación de la lordosis</option>
+            <option value="stenosis">Estenosis o Hernia</option>
+          </select>
+        </label>
+
+        <label>Grado (si aplica):
+          <select id="med_grade">
+            <option value="1">Grado 1 (Leve)</option>
+            <option value="2">Grado 2 (Moderado)</option>
+          </select>
+        </label>
+
+        <button id="btn_apply_medical">Aplicar al Visor</button>
+        <p class="cap" id="med_msg" style="color:var(--safe); font-weight:700; margin-top:8px; display:none;">¡Límites aplicados!</p>
+      </div>
+
       <div class="btns" id="pm" style="margin-top:12px;">
         <button data-h="rot" aria-pressed="true" style="flex:1; font-size:0.9rem; padding:6px;">Rotación</button>
         <button data-h="tilt" aria-pressed="false" style="flex:1; font-size:0.9rem; padding:6px;">Inclinación</button>
@@ -154,23 +190,6 @@ h2{font-size:1.15rem;margin:0 0 12px;}
       <p class="cap" id="deg" style="margin-top:16px; font-size:0.85rem;"></p>
       <p class="cap" id="pose" aria-live="polite" style="font-weight:700; color:var(--ink);"></p>
       
-      <!-- [NUEVO] Asistente de Certificados/Informes -->
-      <div class="profile" style="border-top:none; margin-top:10px; padding-top:0;">
-        <div class="assistant-box">
-          <h3>⚙️ Configurar desde mi Informe</h3>
-          <p class="cap" style="font-size:0.8rem; margin-bottom:8px;">Marca lo que indiquen tus resonancias o RX para ajustar los límites automáticamente.</p>
-          
-          <label><input type="checkbox" id="inf_ant"> Anterolistesis (deslizamiento)</label>
-          <label><input type="checkbox" id="inf_rect" checked> Rectificación de la lordosis</label>
-          <label><input type="checkbox" id="inf_est"> Estenosis del canal o hernia</label>
-          
-          <button id="btn_generate" style="background:var(--strbg); color:var(--str); border-color:var(--str); margin-top:8px;">
-            Aplicar hallazgos al perfil
-          </button>
-          <p class="cap" id="gen_msg" style="color:var(--safe); font-weight:700; margin-top:8px; display:none;">¡Perfil generado y aplicado!</p>
-        </div>
-      </div>
-
       <div class="profile">
         <h3>Mi perfil (localStorage)</h3>
         <div class="row">
@@ -189,7 +208,7 @@ h2{font-size:1.15rem;margin:0 0 12px;}
             <option value="50">50%</option>
           </select>
         </div>
-        <button id="p_save" type="button">Guardar perfil</button>
+        <button id="p_save" type="button">Guardar perfil manual</button>
         <button id="p_reset" type="button">Borrar</button>
       </div>
     </section>
@@ -679,43 +698,57 @@ $("p_reset").addEventListener("click", () => {
   render();
 });
 
-// [NUEVO] Lógica del asistente de informes
-$("btn_generate").addEventListener("click", () => {
-  const hasAnt = $("inf_ant").checked;
-  const hasRect = $("inf_rect").checked;
-  const hasEst = $("inf_est").checked;
+// [NUEVO] Lógica del formulario médico
+$("btn_apply_medical").addEventListener("click", () => {
+  const level = $("med_level").value;
+  const finding = $("med_finding").value;
+  const grade = $("med_grade").value;
 
-  let newFlex = 40; 
-  let newRot = 60;
+  let newFlex = 45; 
+  let newRot = 70;
   let newZone = 40;
 
-  if (hasAnt) {
-    newFlex = 30; 
-    newZone = 30; 
+  // Lógica basada en el nivel de la lesión
+  if (level === "c1_c2") {
+    newFlex = 30;
+    newRot = 45;
+    newZone = 25; // Más restrictivo
+  } else if (level === "c5_c7") {
+    newFlex = 40;
+    newRot = 55;
+    newZone = 35;
   }
-  if (hasRect) {
-    newFlex -= 5; 
-  }
-  if (hasEst) {
+
+  // Lógica basada en el hallazgo
+  if (finding === "ant") {
     newFlex -= 5;
-    newRot = 45; 
-    newZone = 25; 
+    if (grade === "2") newFlex -= 10; // Si es grado 2, más restrictivo
+  } else if (finding === "stenosis") {
+    newFlex -= 5;
+    newRot -= 10;
+  } else if (finding === "rect") {
+    newFlex -= 3;
   }
 
+  // Límites mínimos de seguridad
   newFlex = Math.max(15, newFlex);
-  newRot = Math.max(30, newRot);
+  newRot = Math.max(20, newRot);
+  newZone = Math.max(20, newZone);
 
+  // Aplicar valores a la interfaz
   $("p_flex").value = newFlex;
   $("p_rot").value = newRot;
   $("p_zone").value = newZone;
 
+  // Guardar y actualizar
   readProfileUI();
   saveProfile();
   refreshMaxes();
   syncProfileUI();
   render();
 
-  const msg = $("gen_msg");
+  // Mensaje de confirmación
+  const msg = $("med_msg");
   msg.style.display = "block";
   setTimeout(() => { msg.style.display = "none"; }, 3000);
 });
