@@ -9,114 +9,116 @@
 <style>
 :root{--bg:#eaf0f2;--card:#fff;--ink:#12242c;--mute:#52656e;--line:#c9d6db;--acc:#0b6b73;--str:#9a5b00;--strbg:#fff0d6;--cmp:#a3211b;--cmpbg:#fde3e1;--ok:#e4ebee;--vago:#7a3fb0;--art:#c2410c;--bone:#d9e2e6;--safe:#1f7a3a;--safebg:#e3f4e8;}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a1f;--card:#16262d;--ink:#e6f0f3;--mute:#9db1b9;--line:#2b414a;--acc:#4fc3cc;--str:#f5b84a;--strbg:#3a2c0e;--cmp:#ff8a80;--cmpbg:#40201e;--ok:#1f333b;--vago:#c79bf0;--art:#ff9a62;--bone:#2b414a;--safe:#7fd49a;--safebg:#173324}}
-:root[data-theme="dark"]{--bg:#0e1a1f;--card:#16262d;--ink:#e6f0f3;--mute:#9db1b9;--line:#2b414a;--acc:#4fc3cc;--str:#f5b84a;--strbg:#3a2c0e;--cmp:#ff8a80;--cmpbg:#40201e;--ok:#1f333b;--vago:#c79bf0;--art:#ff9a62;--bone:#2b414a;--safe:#7fd49a;--safebg:#173324}}
+:root[data-theme="dark"]{--bg:#0e1a1f;--card:#16262d;--ink:#e6f0f3;--mute:#9db1b9;--line:#2b414a;--acc:#4fc3cc;--str:#f5b84a;--strbg:#3a2c0e;--cmp:#ff8a80;--cmpbg:#40201e;--ok:#1f333b;--vago:#c79bf0;--art:#ff9a62;--bone:#2b414a;--safe:#7fd49a;--safebg:#173324}
+
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 "Atkinson Hyperlegible",system-ui,sans-serif}
 
-main{max-width:1400px;margin:0 auto;padding:20px 24px 40px}
+main{max-width:1600px;margin:0 auto;padding:20px 24px 40px}
 h1{font-size:1.7rem;margin:0 0 4px;line-height:1.2}
-.sub{color:var(--mute);margin:0 0 18px;max-width:60ch}
+.sub{color:var(--mute);margin:0 0 18px;max-width:80ch}
+
+/* --- DASHBOARD GRID --- */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: start;
+}
+@media(min-width: 1100px) {
+    .grid {
+        grid-template-columns: 340px minmax(450px, 1fr) 400px;
+    }
+}
+@media(min-width: 800px) and (max-width: 1099px) {
+    .grid {
+        grid-template-columns: minmax(400px, 1fr) 340px;
+    }
+    .col-viz { grid-column: 1 / 2; grid-row: 1 / 3; }
+    .col-ctrl { grid-column: 2 / 3; grid-row: 1 / 2; }
+    .col-info { grid-column: 2 / 3; grid-row: 2 / 3; }
+}
+
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
 .btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-button{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer}
+button{font:inherit;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;transition: background 0.2s;}
+button:hover{background:var(--line);}
 button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--card);font-weight:700}
+button[aria-pressed="true"]:hover{background:var(--acc);}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-.fig{width:100%;height:100%;display:block;background:var(--bg);border-radius:8px}
+
+/* --- VISOR --- */
+.fig-wrap{display:flex;gap:16px;align-items:stretch;width:100%;height: 480px; margin-bottom:16px;}
+.fig-wrap > * {min-width:0;background:var(--bg);border-radius: 8px;overflow: hidden; position: relative;}
+#fig {flex: 1.2; width: 100%;height: 100%;object-fit: contain;}
+#webgl-container {flex: 1; display: flex;justify-content: center;align-items: center; min-height: 400px;}
+#webgl-container canvas {position: absolute;top: 0;left: 0;width: 100% !important;height: 100% !important;z-index: 1;}
+#loading-msg {position: absolute;z-index: 0;color: var(--mute);font-size: 0.9rem;text-align: center;padding: 20px;}
+
 .cap{font-size:.9rem;color:var(--mute);margin:6px 0 10px}
 label{display:block;font-weight:700;margin:10px 0 4px}
-input[type=range]{width:100%;accent-color:var(--acc)}
-.lg{display:flex;gap:12px;flex-wrap:wrap;font-size:.85rem;color:var(--mute);margin-top:8px}
-.lg i{display:inline-block;width:18px;height:4px;vertical-align:middle;margin-right:5px;border-radius:2px}
-.s{border:1px solid var(--line);border-left-width:6px;border-radius:8px;padding:10px 12px;margin-bottom:10px;background:var(--card)}
-.s h3{margin:0;font-size:1.05rem;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
-.tag{font-size:.8rem;font-weight:700;padding:2px 8px;border-radius:99px}
-.s p{margin:4px 0 0;color:var(--mute);font-size:.95rem}
+input[type=range]{width:100%;accent-color:var(--acc);margin: 8px 0;}
+.ax{margin:12px 0; border-bottom:1px solid var(--line); padding-bottom:12px;}
+.ax:last-of-type{border-bottom:none; padding-bottom:0;}
+.ends{display:flex;justify-content:space-between;font-size:.85rem;color:var(--mute)}
+
+/* --- PAD COMPACTO --- */
+#pad{position:relative;width:180px;aspect-ratio:1;margin:0 auto 10px;background:linear-gradient(var(--line),var(--line)) center/1px 100% no-repeat,linear-gradient(var(--line),var(--line)) center/100% 1px no-repeat,var(--bg);border:2px solid var(--line);border-radius:12px;touch-action:none;cursor:grab; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);}
+#pad:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+#pad .safe-zone{position:absolute;left:20%;top:20%;width:60%;height:60%;border:2px dashed var(--safe);border-radius:50%;opacity:.45;pointer-events:none}
+#dot{position:absolute;left:50%;top:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:var(--acc);border:3px solid var(--card);box-shadow:0 0 0 1px var(--acc);transition:background .15s,border-color .15s}
+#dot.out{background:var(--str);border-color:var(--strbg);box-shadow:0 0 0 1px var(--str)}
+.pl{position:absolute;font-size:.7rem;color:var(--mute);font-weight:700;pointer-events:none; opacity: 0.7;}
+.pl.u{top:3px;left:50%;transform:translateX(-50%)}.pl.d{bottom:3px;left:50%;transform:translateX(-50%)}.pl.l{left:4px;top:50%;margin-top:-8px}.pl.r{right:4px;top:50%;margin-top:-8px}
+
+.lg{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--mute);margin-top:12px; padding-top:12px; border-top:1px solid var(--line);}
+.lg i{display:inline-block;width:16px;height:16px;vertical-align:middle;margin-right:5px;border-radius:4px; border:1px solid rgba(0,0,0,0.2);}
+
+/* --- INFO CARDS --- */
+h2{font-size:1.15rem;margin:0 0 12px;}
+.s{border:1px solid var(--line);border-left-width:5px;border-radius:8px;padding:12px;margin-bottom:10px;background:var(--card);box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+.s h3{margin:0;font-size:1rem;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.tag{font-size:.75rem;font-weight:700;padding:2px 8px;border-radius:99px; white-space:nowrap;}
+.s p{margin:6px 0 0;color:var(--mute);font-size:.9rem}
 .s0{border-left-color:var(--line)}.s0 .tag{background:var(--ok)}
 .s1{border-left-color:var(--str)}.s1 .tag{background:var(--strbg);color:var(--str)}
 .s2{border-left-color:var(--cmp)}.s2 .tag{background:var(--cmpbg);color:var(--cmp)}
-.note{margin-top:16px;font-size:.9rem;color:var(--mute);max-width:75ch}
-.bd{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--card);font-size:.8rem;margin-right:8px}
-@keyframes pl{50%{stroke-width:5}}.mk2 circle{animation:pl 1.4s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.mk2 circle{animation:none}}
-.ax{margin:8px 0 14px}.ends{display:flex;justify-content:space-between;font-size:.85rem;color:var(--mute)}
-#pad{position:relative;width:200px;max-width:100%;aspect-ratio:1;margin:0 auto 10px;background:linear-gradient(var(--line),var(--line)) center/1px 100% no-repeat,linear-gradient(var(--line),var(--line)) center/100% 1px no-repeat,var(--bg);border:2px solid var(--line);border-radius:12px;touch-action:none;cursor:grab}
-#pad:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-#pad .safe-zone{position:absolute;left:25%;top:25%;width:50%;height:50%;border:2px dashed var(--safe);border-radius:50%;opacity:.45;pointer-events:none}
-#dot{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--acc);border:3px solid var(--card);box-shadow:0 0 0 1px var(--acc);transition:background .15s,border-color .15s}
-#dot.out{background:var(--str);border-color:var(--strbg);box-shadow:0 0 0 1px var(--str)}
-.pl{position:absolute;font-size:.72rem;color:var(--mute);font-weight:400;pointer-events:none}
-.pl.u{top:3px;left:50%;transform:translateX(-50%)}.pl.d{bottom:3px;left:50%;transform:translateX(-50%)}.pl.l{left:6px;top:50%;margin-top:-18px}.pl.r{right:6px;top:50%;margin-top:-18px}
-#pm{justify-content:center}
-h2{font-size:1.15rem;margin:20px 0 8px}
-.bm{display:flex;gap:14px;align-items:flex-start}.bm svg{width:110px;flex:none}.bm>div{flex:1;min-width:0}
-#pr div{padding-left:10px;border-left:3px solid var(--cmp);margin-top:4px}
 
-.grid{display:grid;grid-template-columns: 1fr;gap:24px;align-items:start}
-@media(min-width:900px){
-  .grid{grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.2fr);}
-}
-.sticky-viz {position: sticky;top: 0;z-index: 10;background: var(--bg);padding-top: 10px;}
-.fig-wrap{display:flex;gap:16px;align-items:stretch;width:100%;margin-bottom:16px;height: 460px; }
-.fig-wrap > * {min-width:0;background: var(--bg);border-radius: 8px;overflow: hidden; position: relative;}
-#fig {flex: 1.6; width: 100%;height: 100%;object-fit: contain;}
-#webgl-container {flex: 0.9; display: flex;justify-content: center;align-items: center; min-height: 400px;}
+.bd{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--card);font-size:.75rem;margin-right:8px; flex-shrink:0;}
+.note{margin-top:24px;font-size:.85rem;color:var(--mute);max-width:90ch; background:var(--card); padding:16px; border-radius:8px; border:1px solid var(--line);}
 
-#webgl-container canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100% !important;
-    height: 100% !important;
-    z-index: 1;
-}
-#loading-msg {
-    position: absolute;
-    z-index: 0;
-    color: var(--mute);
-    font-size: 0.9rem;
-    text-align: center;
-    padding: 20px;
-}
+/* --- MAPA CORPORAL --- */
+.bm{display:flex;gap:16px;align-items:flex-start; margin-top:16px;}
+.bm svg{width:100px;flex:none; background:var(--bg); border-radius:8px; padding:8px;}
+.bm>div{flex:1;min-width:0}
+.bp-note{font-size:.85rem;color:var(--mute);margin:0 0 12px;padding:10px;background:var(--ok);border-radius:6px; border-left: 3px solid var(--acc);}
 
-@media(max-width:760px){
-  .fig-wrap{flex-direction:column; height: 650px;}
-  #fig { flex: 1; width:100%; aspect-ratio: auto;}
-  #webgl-container { flex: 1; width:100%;}
-  .bm{flex-direction:column;align-items:center}.bm svg{width:90px}
-  #pr{font-size:.8rem;max-height:18vh;overflow:auto}
-}
-.clinical-warning {
-    background-color: var(--cmpbg);
-    color: var(--cmp);
-    border: 2px solid var(--cmp);
-    border-radius: 8px;
-    padding: 12px;
-    margin-top: 12px;
-    font-weight: bold;
-    display: none;
-}
-.clinical-warning.active {
-    display: block;
-    animation: pulse 2s infinite;
-}
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(163, 33, 27, 0.4); }
-    70% { box-shadow: 0 0 0 10px rgba(163, 33, 27, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(163, 33, 27, 0); }
-}
-/* [MEJORA C] Panel de perfil */
-.profile{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
-.profile h3{font-size:1rem;margin:0 0 8px}
-.profile .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
-.profile input[type=number]{width:80px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
-.profile select{padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
-.profile small{color:var(--mute);display:block;margin-top:4px}
-/* [MEJORA A] Aviso de zona cómoda */
-.zone-note{font-size:.9rem;color:var(--str);margin-top:6px;min-height:1.2em}
+/* --- ADVERTENCIAS --- */
+.clinical-warning {background-color: var(--cmpbg);color: var(--cmp);border: 2px solid var(--cmp);border-radius: 8px;padding: 12px;margin-top: 12px;font-weight: bold;display: none;}
+.clinical-warning.active {display: block;animation: pulse 2s infinite;}
+@keyframes pulse {0% { box-shadow: 0 0 0 0 rgba(163, 33, 27, 0.4); }70% { box-shadow: 0 0 0 10px rgba(163, 33, 27, 0); }100% { box-shadow: 0 0 0 0 rgba(163, 33, 27, 0); }}
+
+/* --- PERFIL --- */
+.profile{margin-top:16px;border-top:1px solid var(--line);padding-top:16px}
+.profile h3{font-size:1rem;margin:0 0 12px}
+.profile .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px; justify-content: space-between;}
+.profile .row label {margin:0; font-weight:400; font-size:0.95rem;}
+.profile input[type=number]{width:70px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit; text-align:center;}
+.profile select{flex:1; padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit;}
+.profile small{color:var(--mute);display:block;margin-top:8px; font-size:.8rem;}
+.profile button {width: 100%; margin-top: 8px;}
+
+.zone-note{font-size:.9rem;color:var(--str);margin-top:6px;min-height:1.2em; font-weight:700;}
 .zone-note.in{color:var(--safe)}
-/* [MEJORA F] Descargo en mapa corporal */
-.bp-note{font-size:.85rem;color:var(--mute);margin:0 0 8px;padding:8px;background:var(--ok);border-radius:6px}
+
+/* --- RESPONSIVE --- */
+@media(max-width:800px){
+  .fig-wrap{flex-direction:column; height: 600px;}
+  #fig { flex: 1; width:100%;}
+  #webgl-container { flex: 1; width:100%;}
+  .bm{flex-direction:column;align-items:center}.bm svg{width:120px}
+}
 </style>
 </head>
 <body>
@@ -125,74 +127,98 @@ h2{font-size:1.15rem;margin:20px 0 8px}
 <p class="sub" id="subtitle">Basado en tus resonancias (2022-2024). Este esquema refleja tu rectificación de la lordosis y la anterolistesis C2-C4 en flexión. No mide compresión real, pero advierte de tus riesgos específicos.</p>
 
 <div class="grid">
-  <div>
-    <div class="card sticky-viz">
+  
+  <!-- COLUMNA 1: CONTROLES -->
+  <div class="col-ctrl">
+    <section class="card" aria-label="Controles de movimiento">
+      <h2>Controles</h2>
+      <label style="font-weight:400; font-size:0.95rem; background:var(--bg); padding:8px; border-radius:6px;"><input type="checkbox" id="sed" checked> Tengo SED o hipermovilidad (mostrar advertencias)</label>
+      
+      <div class="btns" id="pm" style="margin-top:12px;">
+        <button data-h="rot" aria-pressed="true" style="flex:1; font-size:0.9rem; padding:6px;">Rotación</button>
+        <button data-h="tilt" aria-pressed="false" style="flex:1; font-size:0.9rem; padding:6px;">Inclinación</button>
+      </div>
+      
+      <div id="pad" tabindex="0" role="group" aria-label="Control de dirección del cuello. Arrastra el punto o usa las flechas del teclado.">
+        <div class="safe-zone" aria-hidden="true"></div>
+        <i id="dot"></i><b class="pl u">Extensión</b><b class="pl d">Flexión</b><b class="pl l">Izq.</b><b class="pl r">Der.</b>
+      </div>
+      
+      <p class="zone-note in" id="zone-note" aria-live="polite" style="text-align:center; font-size:0.8rem; margin-bottom:16px;">Dentro de la zona cómoda</p>
+      
+      <div id="sl"></div>
+      <p class="cap" id="deg" style="margin-top:16px; font-size:0.85rem;"></p>
+      <p class="cap" id="pose" aria-live="polite" style="font-weight:700; color:var(--ink);"></p>
+      
+      <div class="profile">
+        <h3>Mi perfil (localStorage)</h3>
+        <div class="row">
+          <label for="p_flex">Flexión máx:</label>
+          <input type="number" id="p_flex" min="10" max="60" step="1" value="35" aria-label="Flexión máxima cómoda en grados"> <span>°</span>
+        </div>
+        <div class="row">
+          <label for="p_rot">Rotación máx:</label>
+          <input type="number" id="p_rot" min="10" max="80" step="1" value="60" aria-label="Rotación máxima cómoda en grados"> <span>°</span>
+        </div>
+        <div class="row">
+          <label for="p_zone">Zona cómoda:</label>
+          <select id="p_zone" aria-label="Porcentaje de la zona cómoda">
+            <option value="25">25%</option>
+            <option value="40" selected>40%</option>
+            <option value="50">50%</option>
+          </select>
+        </div>
+        <button id="p_save" type="button">Guardar perfil</button>
+        <button id="p_reset" type="button">Borrar</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- COLUMNA 2: VISOR -->
+  <div class="col-viz">
+    <div class="card">
       <div class="fig-wrap">
         <svg class="fig" id="fig" viewBox="0 0 320 380" role="img" aria-label="Esquema del cuello"></svg>
         <div id="webgl-container" role="img" aria-label="Modelo 3D de la postura de la cabeza. No muestra estructuras internas ni compresión real.">
             <div id="loading-msg">Cargando modelo 3D...</div>
         </div>
       </div>
-      <p class="cap" id="cap"></p>
+      <p class="cap" id="cap" style="text-align:center; font-weight:700;"></p>
       
       <div id="clinical-warning" class="clinical-warning">
         ⚠️ ATENCIÓN: Tu RX dinámica confirma anterolistesis de C2 sobre C3 y C3 sobre C4 en flexión. Evita forzar el mentón al pecho.
       </div>
 
-      <div class="cap" id="pr" style="color:var(--ink)"></div>
-    </div>
+      <div class="cap" id="pr" style="color:var(--ink); margin-top:12px;"></div>
 
-    <section class="card" aria-label="Controles de movimiento" style="margin-top: 18px;">
-      <label style="font-weight:400"><input type="checkbox" id="sed" checked> Tengo SED o hipermovilidad (mostrar advertencias de variabilidad)</label>
-      <div class="btns" id="pm"><button data-h="rot" aria-pressed="true">Izquierda/derecha: rotación</button><button data-h="tilt" aria-pressed="false">Izquierda/derecha: inclinación</button></div>
-      <div id="pad" tabindex="0" role="group" aria-label="Control de dirección del cuello. Arrastra el punto o usa las flechas del teclado.">
-        <div class="safe-zone" aria-hidden="true"></div>
-        <i id="dot"></i><b class="pl u">Extensión (arriba)</b><b class="pl d">Flexión (abajo)</b><b class="pl l">Izq.</b><b class="pl r">Der.</b>
+      <div class="lg">
+        <span><i style="background:var(--vago)"></i>Vago</span>
+        <span><i style="background:var(--art)"></i>Art. vertebral</span>
+        <span><i style="background:#d8b84e"></i>Médula</span>
+        <span><i style="background:var(--acc)"></i>Músculo</span>
+        <span><i style="background:var(--bone)"></i>Hueso</span>
       </div>
-      <p class="cap">Arrastra el punto hacia un lado, arriba, abajo o en diagonal. Los deslizadores de abajo se mueven contigo y sirven para ajustar con precisión. El movimiento diagonal combina ejes; no es una articulación adicional.</p>
-      <!-- [MEJORA A] Aviso de zona cómoda -->
-      <p class="zone-note in" id="zone-note" aria-live="polite">Dentro de la zona cómoda (círculo verde). Esta zona es orientativa: el objetivo es el control, no el rango.</p>
-      <div id="sl"></div>
-      <p class="cap" id="deg"></p><p class="cap" id="pose" aria-live="polite"></p><p class="cap">Movimientos incluidos: flexión, extensión, rotación axial, inclinación lateral y traslación anterior/retracción. Las diagonales son combinaciones de esos ejes.</p>
-      <div class="lg"><span><i style="background:var(--vago)"></i>Trayecto aproximado del vago</span><span><i style="background:var(--art)"></i>Trayecto aproximado de la arteria vertebral</span><span><i style="background:#d8b84e"></i>Médula</span><span><i style="background:var(--acc)"></i>Músculo y raíces</span><span><i style="background:var(--bone)"></i>Hueso</span></div>
-      <p class="cap">Los círculos numerados señalan carga o tensión (ámbar) y posible estrechamiento o compromiso teórico (rojo). No representan una compresión medida. El número coincide con la lista; la silueta punteada es la posición neutra.</p>
+      <p class="cap" style="font-size:0.8rem;">Los círculos señalan carga (ámbar) o compromiso teórico (rojo). No representan una compresión medida. Silueta punteada = posición neutra.</p>
+    </div>
+  </div>
 
-      <!-- [MEJORA C] Perfil personal guardado en el navegador -->
-      <div class="profile">
-        <h3>Mi perfil (opcional, se guarda solo en este navegador)</h3>
-        <div class="row">
-          <label for="p_flex" style="margin:0">Flexión máx. cómoda:</label>
-          <input type="number" id="p_flex" min="10" max="60" step="1" value="35" aria-label="Flexión máxima cómoda en grados">
-          <span>°</span>
-        </div>
-        <div class="row">
-          <label for="p_rot" style="margin:0">Rotación máx. cómoda:</label>
-          <input type="number" id="p_rot" min="10" max="80" step="1" value="60" aria-label="Rotación máxima cómoda en grados">
-          <span>°</span>
-        </div>
-        <div class="row">
-          <label for="p_zone" style="margin:0">Zona cómoda (control):</label>
-          <select id="p_zone" aria-label="Porcentaje de la zona cómoda">
-            <option value="25">25% del rango</option>
-            <option value="40" selected>40% del rango</option>
-            <option value="50">50% del rango</option>
-          </select>
-        </div>
-        <button id="p_save" type="button">Guardar mi perfil</button>
-        <button id="p_reset" type="button">Borrar perfil guardado</button>
-        <small>Estos valores son orientativos. No sustituyen una valoración clínica. Se guardan en <code>localStorage</code> de este navegador y no se envían a ningún servidor.</small>
+  <!-- COLUMNA 3: INFORMACIÓN -->
+  <div class="col-info">
+    <section aria-live="polite" style="margin-bottom:24px;">
+      <h2>Estructuras del cuello</h2>
+      <div id="out"></div>
+    </section>
+
+    <section>
+      <h2>Otras partes del cuerpo</h2>
+      <p class="bp-note">Estos síntomas pueden tener muchas causas (disautonomía, inflamación, fatiga). Esta lista es orientativa y <b>no implica que el movimiento cervical sea la causa</b>.</p>
+      <div class="card bm">
+        <svg id="body" viewBox="0 0 120 300" role="img" aria-label="Silueta del cuerpo con las zonas que pueden responder"></svg>
+        <div id="bp"></div>
       </div>
     </section>
   </div>
 
-  <div>
-    <h2>Estructuras del cuello</h2>
-    <section aria-live="polite"><div id="out"></div></section>
-    <h2>Otras partes del cuerpo</h2>
-    <!-- [MEJORA F] Descargo en mapa corporal -->
-    <p class="bp-note">Estos síntomas pueden tener muchas causas (disautonomía, inflamación, fatiga, sueño, etc.). Esta lista es orientativa y no implica que el movimiento cervical sea la causa.</p>
-    <div class="card bm"><svg id="body" viewBox="0 0 120 300" role="img" aria-label="Silueta del cuerpo con las zonas que pueden responder"></svg><div id="bp"></div></div>
-  </div>
 </div>
 
 <p class="note"><b>Aviso Clínico Personalizado:</b> Este visor ha sido adaptado con los hallazgos de tus resonancias y radiografías (2022-2024). Refleja la rectificación de la lordosis cervical y la anterolistesis C2-C4 documentada en flexión. Aunque está basado en tus informes, sigue siendo una representación gráfica simplificada. No sustituye la evaluación de tu médico ni mide la compresión real en tiempo real. No fuerces los rangos extremos. Si aparecen síntomas nuevos (debilidad, desmayo, visión doble), busca atención médica urgente.</p>
@@ -313,7 +339,7 @@ function updateZoneNote() {
   if (dot) dot.classList.toggle("out", out);
 }
 
-function sliders(){$("sl").innerHTML=Object.entries(AX).map(([k,x])=>`<div class="ax"><label for="r_${k}">${x.n}: <b id="o_${k}"></b></label><input type="range" id="r_${k}" data-k="${k}" min="-100" max="100" value="${V0[k]}"><div class="ends"><span>${x.l}</span><span>${x.r}</span></div></div>`).join("")+`<button id="rs">Volver a posición neutra</button>`;}
+function sliders(){$("sl").innerHTML=Object.entries(AX).map(([k,x])=>`<div class="ax"><label for="r_${k}">${x.n}: <b id="o_${k}"></b></label><input type="range" id="r_${k}" data-k="${k}" min="-100" max="100" value="${V0[k]}"><div class="ends"><span>${x.l}</span><span>${x.r}</span></div></div>`).join("")+`<button id="rs" style="width:100%; margin-top:8px;">Volver a posición neutra</button>`;}
 function acts(){const o=[],fe=V0.fe;
 if(fe)o.push({k:"fe",mv:fe>0?"flex":"ext",side:"der",a:Math.abs(fe)});
 if(V0.prot)o.push({k:"prot",mv:"prot",side:V0.prot>0?"der":"izq",a:Math.abs(V0.prot)});
@@ -358,7 +384,6 @@ function eff(s,a,n,q){
   const t = Math.min(1, a / 100);
   const sens = SED() ? 0.8 : 1;
   const v = s * Math.pow(t, 0.7) * sens;
-  // Redondeo a 3 niveles para color/tag, pero el valor interno es continuo
   return v;
 }
 function level(v){ return v >= 1.5 ? 2 : v >= 0.6 ? 1 : 0; }
@@ -445,7 +470,6 @@ return p.length?"Movimiento seleccionado: "+p.join(" + ")+".":"Posición neutra.
 }
 
 // ===== SETUP DE THREE.JS (MOTOR 3D) =====
-// [MEJORA G] Robustez: espera a que el contenedor tenga tamaño; textContent en error; try/catch
 function init3D() {
   if (!container || !container.clientWidth || !container.clientHeight) {
     requestAnimationFrame(init3D);
@@ -483,7 +507,6 @@ function init3D() {
 
     const loader = new OBJLoader();
     const isGitHubPages = window.location.hostname.includes('github.io');
-    // [MEJORA] URL relativa robusta: funciona tanto en raíz como en subcarpeta
     const modelUrl = isGitHubPages
       ? new URL('Person002_wrap.obj?v=2', window.location.href).href
       : './Person002_wrap.obj';
@@ -531,7 +554,6 @@ function init3D() {
     (err) => {
       console.error("❌ Error cargando el modelo .obj: ", err);
       if(loadingMsg) loadingMsg.style.display = 'none';
-      // [MEJORA G] Sin innerHTML con URL dinámica; textContent seguro
       const errorDiv = document.createElement('div');
       errorDiv.style.cssText = 'color: var(--cmp); padding: 20px; text-align: center; font-size: 0.9rem; background: var(--cmpbg); border-radius: 8px; margin: 10px; position:absolute; z-index:2;';
       const b = document.createElement('b'); b.textContent = "Error al cargar el modelo 3D";
@@ -579,7 +601,6 @@ if(!v)o.textContent="neutra";
 else if(k==="prot")o.textContent=`${Math.abs(v)}% ${v>0?"adelantamiento":"retracción"}`;
 else{const q=k==="fe"?(v>0?"flex":"ext"):k;o.textContent=`${(MOV[q].max*kk*Math.abs(v)/100).toFixed(0)}° ${k==="fe"?(v>0?"flexión":"extensión"):v>0?"a la derecha":"a la izquierda"}`;}}
 $("pose").textContent=poseSummary();
-// [MEJORA B] Texto adaptado al perfil y a SED
 $("deg").textContent=SED()
   ? `Modo clínico personalizado: perfil guardado con flexión máx. ${PROFILE.flexMax}° y rotación máx. ${PROFILE.rotMax}°. Los rangos son orientativos y no sustituyen una medición clínica.`
   : `Rangos orientativos del esquema. No sustituyen una medición clínica.`;
@@ -628,7 +649,6 @@ $("p_reset").addEventListener("click", () => {
   render();
 });
 
-// Arranque: cargar perfil, aplicar máximos, pintar UI
 loadProfile();
 refreshMaxes();
 syncProfileUI();
